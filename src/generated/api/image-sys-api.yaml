@@ -1,0 +1,191 @@
+---
+openapi: 3.0.0
+info:
+  title: image-sys-api
+  description: API accepts images to store in a Database
+  contact:
+    email: dev@aaronrenner.com
+  version: 1.0.0
+tags:
+- name: images
+  description: Operations to manage images
+
+paths:
+  /images:
+    get:
+      tags:
+      - images
+      summary: searches images
+      description: |
+        Obtain all the image objects in one array. No pagination exists so response times vary.
+      operationId: get-images
+      parameters:
+      - in: query
+        name: limit
+        description: If supplied with the page recieve pagnated results
+        required: false
+        schema:
+          type: number
+      - in: query
+        name: page
+        description: If supplied with the limit recieve pagnated results
+        required: false
+        schema:
+          type: number
+      - in: query
+        name: onlyData
+        description: Suply with 'true' value to return no image data, saves on a lot of response time
+        required: false
+        schema:
+          type: boolean
+      responses:
+        "200":
+          description: |
+            All image resources.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/imageItem'
+    post:
+      tags:
+      - images
+      summary: adds an image item
+      description: |
+        Adds an item to the database.
+      operationId: post-images
+      requestBody:
+        description: |
+          Image formdata to send.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imageItem'
+      responses:
+        "201":
+          description: |
+            item created.
+          headers:
+            location:
+              description: |
+                URL to access new image object
+                "http://localhost:8000/imageUpload-sys-api/00199ed5-2f4d-4301-b3da-c572a94fc10f"
+              style: simple
+              explode: false
+              schema:
+                type: string
+        "500":
+          description: |
+            server could not process the request.
+  /images/{uuid}:
+    get:
+      tags:
+      - images
+      summary: finds an image
+      description: |
+        Obtain a single image by its UUID in the database.
+      operationId: get-images-uuid
+      parameters:
+        - $ref: '#/components/parameters/imageUuidInPath'
+      responses:
+        "200":
+          description: |
+            All image resources.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/imageItem'
+        "404":
+          description: |
+            Image could not be located.
+    put:
+      tags:
+      - images
+      summary: modify an image item
+      description: |
+        Modify the image record in the database.
+      operationId: put-images-uuid
+      parameters:
+        - $ref: '#/components/parameters/imageUuidInPath'
+      requestBody:
+        description: |
+          Image item to add.
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/imageItem'
+      responses:
+        "204":
+          description: |
+            image modified.
+        "404":
+          description: |
+            image UUID was not found.
+    delete:
+      tags:
+      - images
+      summary: removes an image
+      description: |
+        Removes an image from the database by its UUID.
+      operationId: delete-images-uuid
+      parameters:
+        - $ref: '#/components/parameters/imageUuidInPath'
+      responses:
+        "204":
+          description: |
+            image removed.
+        "404":
+          description: |
+            Image could not be located.
+components:
+  schemas:
+    imageItem:
+      required:
+      - description
+      - image
+      - imageSize
+      - megapixels
+      - mimeType
+      - name
+      type: object
+      properties:
+        image:
+          type: string
+          description: |
+            Encode an image in base64
+          example: iVBORw0KGgoAAAANSUhEUgAAAAUAAAAFCAYAAACNbyblAAAAHElEQVQI12P4//8/w38GIAXDIBKE0DHxgljNBAAO9TXL0Y4OHwAAAABJRU5ErkJggg==ima
+        name:
+          type: string
+          description: |
+            This field should be resolved from the file name without the extension
+          example: testImage
+        description:
+          type: string
+          example: This is a description of an image
+        imageSize:
+          type: string
+          example: 1920x2080
+        mimeType:
+          type: string
+          description: |
+            Image mime types <https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types>
+          example: image/png
+        megapixels:
+          type: number
+          example: 1.293
+        metadata:
+          type: object
+          description: Additional resolved fields
+  parameters:
+    imageUuidInPath:
+      name: uuid
+      in: path
+      description: The image UUID
+      required: true
+      style: simple
+      explode: false
+      schema:
+        maximum: 36
+        minimum: 36
+        type: string

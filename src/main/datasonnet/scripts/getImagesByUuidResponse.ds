@@ -1,0 +1,26 @@
+/** DataSonnet
+version=2.0
+output application/json
+input payload application/java
+*/
+
+local result = payload["#result-set-1"][0];
+
+local processMetadata(body_data) =
+	if((body_data != null) && (body_data != '{}')) then
+    	ds.read(body_data, "application/json", {})
+	else
+    	{}
+;
+
+{
+		uuid: result.uuid,
+		name: result.name,
+		description: result.description,
+		image: result.image,
+		imageSize: result.image_size,
+		mimeType: result.mime_type,
+		megapixels: result.megapixels,
+		uploadDate: result.upload_date,
+		metadata: processMetadata(result.metadata)
+}

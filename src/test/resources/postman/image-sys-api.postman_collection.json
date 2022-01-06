@@ -1,0 +1,459 @@
+{
+	"info": {
+		"_postman_id": "e855eacc-8474-4400-b5e0-b1d4391ebfe2",
+		"name": "image-sys-api",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Happy Paths",
+			"item": [
+				{
+					"name": "/images",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');",
+									"});",
+									"pm.test(\"Response body is array\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"array\");",
+									"});",
+									"pm.test(\"Response body status is formatted\", () => {",
+									"    pm.expect(jsonData[0]['name']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['description']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['image']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['imageSize']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['mimeType']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['uploadDate']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['metadata']).to.be.a(\"object\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images - pagination",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');",
+									"});",
+									"pm.test(\"Response body is object\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\");",
+									"});",
+									"pm.test(\"Response body is pagnated\", () => {",
+									"    pm.expect(jsonData['metadata']['count']).to.be.a(\"number\");",
+									"    pm.expect(jsonData['metadata']['limit']).to.be.a(\"number\");",
+									"    pm.expect(jsonData['metadata']['page']).to.be.a(\"number\");",
+									"    pm.expect(jsonData['metadata']['pages']).to.be.a(\"number\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images?limit=3&page=1",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images"
+							],
+							"query": [
+								{
+									"key": "limit",
+									"value": "3"
+								},
+								{
+									"key": "page",
+									"value": "1"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images - onlyData",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');",
+									"});",
+									"pm.test(\"Response body is array\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"array\");",
+									"});",
+									"pm.test(\"Response body is pagnated\", () => {",
+									"    pm.expect(jsonData[0]['uuid']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['name']).to.be.a(\"string\");",
+									"    pm.expect(jsonData[0]['description']).to.be.a(\"string\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images?onlyData=true",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images"
+							],
+							"query": [
+								{
+									"key": "onlyData",
+									"value": "true"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const locationHeader = pm.response.headers.get('location');",
+									"const newImageUuid = locationHeader.split(\"/\")[5];",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 204\", () => {",
+									"        pm.expect(pm.response.code).to.eql(204);",
+									"});",
+									"pm.test(\"Response headers contain UUID\", () => {",
+									"    pm.expect(newImageUuid).to.be.a(\"string\");",
+									"});",
+									"pm.test(\"Save response UUID as variable\", () => {",
+									"    postman.setEnvironmentVariable(\"newImageUuid\", newImageUuid);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Robot Emoji\",\n    \"description\": \"{{$randomCatchPhrase}}\",\n    \"image\": \"8J+klg==\",\n    \"imageSize\": \"48x48\",\n    \"mimeType\": \"image/png\",\n    \"megapixels\": 0.666,\n    \"metadata\": {\n        \"isEmoji\": true,\n        \"isTest\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images/{uuid}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/json');",
+									"});",
+									"pm.test(\"Response body is array\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\");",
+									"});",
+									"pm.test(\"Response body status is formatted\", () => {",
+									"    pm.expect(jsonData['name']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['description']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['image']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['imageSize']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['mimeType']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['uploadDate']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['metadata']).to.be.a(\"object\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images/:uuid",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "{{newImageUuid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tests",
+									"pm.test(\"Status code is 204\", () => {",
+									"        pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"name\": \"Robot Emoji\",\n    \"description\": \"{{$randomCatchPhrase}}\",\n    \"image\": \"8J+klg==\",\n    \"imageSize\": \"48x48\",\n    \"mimeType\": \"image/png\",\n    \"megapixels\": 0.666,\n    \"metadata\": {\n        \"isEmoji\": true,\n        \"isTest\": true\n    }\n}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images/:uuid",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "{{newImageUuid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/images/{uuid}",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Tests",
+									"pm.test(\"Status code is 204\", () => {",
+									"        pm.expect(pm.response.code).to.eql(204);",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "DELETE",
+						"header": [],
+						"url": {
+							"raw": "{{HOST}}{{PATH}}/images/:uuid",
+							"host": [
+								"{{HOST}}{{PATH}}"
+							],
+							"path": [
+								"images",
+								":uuid"
+							],
+							"variable": [
+								{
+									"key": "uuid",
+									"value": "{{newImageUuid}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "Actuator",
+			"item": [
+				{
+					"name": "/actuator",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/vnd.spring-boot.actuator.v3+json');",
+									"});",
+									"pm.test(\"Response body is object\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\");",
+									"});",
+									"pm.test(\"Response body status is valid\", () => {",
+									"    pm.expect(jsonData['_links']['self']).to.be.a(\"object\");",
+									"    pm.expect(jsonData['_links']['health']).to.be.a(\"object\");",
+									"    pm.expect(jsonData['_links']['health-path']).to.be.a(\"object\");",
+									"    pm.expect(jsonData['_links']['info']).to.be.a(\"object\");",
+									"    pm.expect(jsonData['_links']['metrics-requiredMetricName']).to.be.a(\"object\");",
+									"    pm.expect(jsonData['_links']['metrics']).to.be.a(\"object\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ACTUATOR}}/actuator",
+							"host": [
+								"{{ACTUATOR}}"
+							],
+							"path": [
+								"actuator"
+							]
+						}
+					},
+					"response": []
+				},
+				{
+					"name": "/actuator/info",
+					"event": [
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"// Set response as variable",
+									"const jsonData = pm.response.json();",
+									"",
+									"// Tests",
+									"pm.test(\"Status code is 200\", () => {",
+									"        pm.expect(pm.response.code).to.eql(200);",
+									"});",
+									"pm.test(\"Content-Type header is application/json\", () => {",
+									"    pm.expect(pm.response.headers.get('Content-Type')).to.eql('application/vnd.spring-boot.actuator.v3+json');",
+									"});",
+									"pm.test(\"Response body is object\", () => {",
+									"    pm.expect(jsonData).to.be.an(\"object\");",
+									"});",
+									"pm.test(\"Response body status is valid\", () => {",
+									"    pm.expect(jsonData['camel.name']).to.be.a(\"string\");",
+									"    pm.expect(jsonData['camel.status']).to.eql('Started');",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{ACTUATOR}}/actuator/info",
+							"host": [
+								"{{ACTUATOR}}"
+							],
+							"path": [
+								"actuator",
+								"info"
+							]
+						}
+					},
+					"response": []
+				}
+			]
+		}
+	]
+}
